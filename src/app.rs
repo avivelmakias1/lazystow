@@ -1,11 +1,11 @@
 use crossterm::event::{self, Event as CEvent, KeyCode, KeyEvent};
+use ratatui::{backend::Backend, Terminal};
 use std::{
     io,
     sync::mpsc,
-    thread::{self},
+    thread,
     time::{Duration, Instant},
 };
-use tui::{backend::Backend, Terminal};
 
 mod stow;
 mod ui;

@@ -1,13 +1,13 @@
-use tui::{
-    backend::Backend,
+use ratatui::{
     layout::{Constraint, Direction, Layout, Rect},
     widgets::{Block, Borders},
     Frame,
 };
+use tui_textarea::TextArea;
 
 use super::App;
 
-pub fn render<B: Backend>(f: &mut Frame<B>, app: &App) {
+pub fn render(f: &mut Frame, app: &App) {
     let size = f.size();
 
     let chunks = Layout::default()
@@ -27,22 +27,26 @@ pub fn render<B: Backend>(f: &mut Frame<B>, app: &App) {
     let block = Block::default().title("Content").borders(Borders::ALL);
     f.render_widget(block, chunks[1]);
     if app.config_dir_popup {
+        //let textarea = TextArea::new(vec![app.current_dir.to_string()]);
         let block = Block::default()
             .title("Edit Directory")
             .borders(Borders::ALL);
-        let area = build_centered_rect(60, 10, size);
-        f.render_widget(block, area);
+        let mut textarea = TextArea::default();
+        textarea.insert_str(app.current_dir.to_string());
+        textarea.set_block(block);
+        let area = build_input_centered_rect(size);
+        f.render_widget(textarea.widget(), area);
     }
 }
 
-fn build_centered_rect(percent_x: u16, percent_y: u16, r: Rect) -> Rect {
+fn build_input_centered_rect(r: Rect) -> Rect {
     let popup_layout = Layout::default()
         .direction(Direction::Vertical)
         .constraints(
             [
-                Constraint::Percentage((100 - percent_y) / 2),
-                Constraint::Percentage(percent_y),
-                Constraint::Percentage((100 - percent_y) / 2),
+                Constraint::Percentage(50),
+                Constraint::Length(3),
+                Constraint::Percentage(50),
             ]
             .as_ref(),
         )
@@ -52,9 +56,9 @@ fn build_centered_rect(percent_x: u16, percent_y: u16, r: Rect) -> Rect {
         .direction(Direction::Horizontal)
         .constraints(
             [
-                Constraint::Percentage((100 - percent_x) / 2),
-                Constraint::Percentage(percent_x),
-                Constraint::Percentage((100 - percent_x) / 2),
+                Constraint::Percentage(20),
+                Constraint::Percentage(60),
+                Constraint::Percentage(20),
             ]
             .as_ref(),
         )

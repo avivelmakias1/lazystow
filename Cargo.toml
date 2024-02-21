@@ -7,10 +7,11 @@ edition = "2021"
 
 [dependencies]
 crossterm = { version = "0.25", features = ["serde"] }
-tui = { version = "0.19", default-features = false, features = [
+ratatui = { version = "0.26.1", default-features = false, features = [
     "crossterm",
     "serde",
 ] }
+tui-textarea = { version = "0.4.0", features = ["crossterm"] }
 serde = { version = "1.0", features = ["derive"] }
 chrono = { version = "0.4", features = ["serde"] }
 rand = { version = "0.8", default-features = false, features = ["std"] }
