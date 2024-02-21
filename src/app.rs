@@ -1,18 +1,11 @@
-use crossterm::{
-    event::{self, DisableMouseCapture, Event as CEvent, KeyCode, KeyEvent},
-    execute,
-    terminal::{disable_raw_mode, enable_raw_mode, LeaveAlternateScreen},
-};
+use crossterm::event::{self, Event as CEvent, KeyCode, KeyEvent};
 use std::{
     io,
     sync::mpsc,
     thread::{self},
     time::{Duration, Instant},
 };
-use tui::{
-    backend::{Backend, CrosstermBackend},
-    Terminal,
-};
+use tui::{backend::Backend, Terminal};
 
 mod stow;
 mod ui;
@@ -64,10 +57,11 @@ fn run_input_thread() -> mpsc::Receiver<Event<KeyEvent>> {
 pub fn run_app<B: Backend>(terminal: &mut Terminal<B>, mut app: App) -> io::Result<()> {
     let rx = run_input_thread();
     loop {
-        terminal.draw(ui::render)?;
+        terminal.draw(|f| ui::render(f, &app))?;
         match rx.recv().unwrap() {
             Event::Input(event) => match event.code {
                 KeyCode::Char('q') => return Ok(()),
+                KeyCode::Char('C') => app.config_dir_popup = true,
                 _ => {}
             },
             Event::Tick => {}
