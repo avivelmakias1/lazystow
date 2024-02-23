@@ -1,34 +1,43 @@
-use crossterm::{
-    event::DisableMouseCapture,
-    execute,
-    terminal::{disable_raw_mode, enable_raw_mode, LeaveAlternateScreen},
+#![allow(dead_code)]
+#![allow(unused_imports)]
+#![allow(unused_variables)]
+
+pub mod action;
+pub mod app;
+pub mod cli;
+pub mod components;
+pub mod config;
+pub mod mode;
+pub mod tui;
+pub mod utils;
+
+use clap::Parser;
+use cli::Cli;
+use color_eyre::eyre::Result;
+
+use crate::{
+  app::App,
+  utils::{initialize_logging, initialize_panic_handler, version},
 };
-use ratatui::{backend::CrosstermBackend, Terminal};
-use std::io;
 
-mod app;
+async fn tokio_main() -> Result<()> {
+  initialize_logging()?;
 
-fn main() -> Result<(), io::Error> {
-    // setup terminal
-    enable_raw_mode().expect("can run in raw mode");
-    let stdout = io::stdout();
-    let backend = CrosstermBackend::new(stdout);
-    let mut terminal = Terminal::new(backend)?;
-    terminal.clear()?;
-    let app = app::App::new();
-    let res = app::run_app(&mut terminal, app);
+  initialize_panic_handler()?;
 
-    // restore terminal
-    disable_raw_mode()?;
-    execute!(
-        terminal.backend_mut(),
-        LeaveAlternateScreen,
-        DisableMouseCapture
-    )?;
-    terminal.show_cursor()?;
-    if let Err(err) = res {
-        println!("{:?}", err)
-    }
+  let args = Cli::parse();
+  let mut app = App::new(args.tick_rate, args.frame_rate)?;
+  app.run().await?;
 
+  Ok(())
+}
+
+#[tokio::main]
+async fn main() -> Result<()> {
+  if let Err(e) = tokio_main().await {
+    eprintln!("{} error: Something went wrong", env!("CARGO_PKG_NAME"));
+    Err(e)
+  } else {
     Ok(())
+  }
 }
