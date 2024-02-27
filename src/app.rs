@@ -6,7 +6,7 @@ use tokio::sync::mpsc;
 
 use crate::{
   action::Action,
-  components::{display_dir::DisplayDir, fps::FpsCounter, home::Home, Component},
+  components::{display_dir::DisplayDir, fps::FpsCounter, home::Home, stow_files::StowFiles, Component},
   config::Config,
   mode::Mode,
   tui,
@@ -27,12 +27,13 @@ impl App {
   pub fn new(tick_rate: f64, frame_rate: f64) -> Result<Self> {
     let fps = FpsCounter::default();
     let display_dir = DisplayDir::default();
+    let stow_files = StowFiles::default();
     let config = Config::new()?;
     let mode = Mode::Home;
     Ok(Self {
       tick_rate,
       frame_rate,
-      components: vec![Box::new(fps), Box::new(display_dir)],
+      components: vec![Box::new(fps), Box::new(display_dir), Box::new(stow_files)],
       should_quit: false,
       should_suspend: false,
       config,

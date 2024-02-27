@@ -12,6 +12,7 @@ use crate::{
 pub mod display_dir;
 pub mod fps;
 pub mod home;
+pub mod stow_files;
 pub mod utils;
 
 /// `Component` is a trait that represents a visual and interactive element of the user interface.

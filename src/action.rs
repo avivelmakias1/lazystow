@@ -21,4 +21,5 @@ pub enum Action {
   Confirm,
   Discard,
   UpdateDir,
+  DirUpdated,
 }

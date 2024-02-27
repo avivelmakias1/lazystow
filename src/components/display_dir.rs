@@ -18,7 +18,7 @@ pub struct DisplayDir {
   command_tx: Option<UnboundedSender<Action>>,
   config: Config,
   current_dir: String,
-  insert_mode: bool,
+  focused: bool,
   before_last_insert_dir: String,
 }
 
@@ -40,7 +40,7 @@ impl Component for DisplayDir {
   }
 
   fn handle_key_events(&mut self, key: KeyEvent) -> Result<Option<Action>> {
-    if self.insert_mode {
+    if self.focused {
       match key.code {
         KeyCode::Char(c) => self.current_dir.push(c),
         KeyCode::Backspace => {
@@ -57,19 +57,22 @@ impl Component for DisplayDir {
       Action::Tick => {},
       Action::UpdateDir => {
         self.before_last_insert_dir = self.current_dir.clone();
-        self.insert_mode = true;
+        self.focused = true;
+      },
+      Action::DirUpdated => {
+        return Ok(Some(Action::Back));
       },
       Action::Confirm => {
-        self.insert_mode = false;
-        return Ok(Some(Action::Back));
+        self.focused = false;
+        return Ok(Some(Action::DirUpdated));
       },
       Action::Discard => {
         self.current_dir = self.before_last_insert_dir.clone();
-        self.insert_mode = false;
+        self.focused = false;
         return Ok(Some(Action::Back));
       },
       Action::Back => {
-        self.insert_mode = false;
+        self.focused = false;
       },
       _ => {},
     }
