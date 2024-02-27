@@ -43,6 +43,9 @@ impl Component for DisplayDir {
     if self.insert_mode {
       match key.code {
         KeyCode::Char(c) => self.current_dir.push(c),
+        KeyCode::Backspace => {
+          self.current_dir.pop();
+        },
         _ => {},
       }
     }
